@@ -109,4 +109,3 @@ void grid_clear_all_choices(Grid_T *g, int i, int j) {
     g->elts[i][j].choices.num[o] = 0;
   }
 }
-
