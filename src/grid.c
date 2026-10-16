@@ -1,43 +1,42 @@
 /********************************************************************
                             grid.c
-   Author: Panagiotis Berberidis  /AM:        csd4376
-   Assignment:   Assignment 4       /Lesson:     HY-255
+   Author: Panagiotis Bermperidis / AM: csd4376
+   Assignment: Assignment 4 / HY-255
 *********************************************************************/
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <assert.h>
 #include "grid.h"
 
-static void zero_memset(int *array, int size) {
-  for (int j = 0; j < size; j++) {
-    array[j] = 0;
-  }
-}
-
 void grid_update_value(Grid_T *g, int i, int j, int n) {
+  assert(g != 0);
+  assert(i >= 0 && i < 9 && j >= 0 && j < 9);
+  assert(n >= 0 && n <= 9);
   g->elts[i][j].val = n;
 }
 
 int grid_read_value(Grid_T g, int i, int j) {
+  assert(i >= 0 && i < 9 && j >= 0 && j < 9);
   return g.elts[i][j].val;
 }
 
 void grid_set_choice(Grid_T *g, int i, int j, int n) {
+  assert(g != 0);
+  assert(n >= 0 && n <= 9);
   g->elts[i][j].choices.num[n] = 1;
 }
 
 void grid_clear_choice(Grid_T *g, int i, int j, int n) {
-  assert(g != NULL);
+  assert(g != 0);
+  assert(n >= 0 && n <= 9);
   g->elts[i][j].choices.num[n] = 0;
 }
 
 int grid_choice_is_valid(Grid_T g, int i, int j, int n) {
+  assert(n >= 0 && n <= 9);
   return g.elts[i][j].choices.num[n] == 1;
 }
 
 void grid_remove_choice(Grid_T *g, int i, int j, int n) {
-  assert(g != NULL);
+  assert(g != 0);
   if (grid_choice_is_valid(*g, i, j, n)) {
     g->elts[i][j].choices.count--;
   }
@@ -49,11 +48,12 @@ int grid_read_count(Grid_T g, int i, int j) {
 }
 
 void grid_set_count(Grid_T *g, int i, int j) {
-  assert(g != NULL);
+  assert(g != 0);
   g->elts[i][j].choices.count = 9;
 }
 
 void grid_clear_count(Grid_T *g, int i, int j) {
+  assert(g != 0);
   g->elts[i][j].choices.count = 0;
 }
 
@@ -62,21 +62,20 @@ int grid_read_unique(Grid_T g) {
 }
 
 void grid_set_unique(Grid_T *g) {
+  assert(g != 0);
   g->unique = 1;
 }
 
 void grid_clear_unique(Grid_T *g) {
-  assert(g != NULL);
+  assert(g != 0);
   g->unique = 0;
 }
 
-void grid_readBlock(int i, int j, Grid_T g, int array[9]) {
-  int z;
-  int k;
-  int o = 0;
-
-  i = i - i % 3;
-  j = j - j % 3;
+void grid_read_block(Grid_T g, int i, int j, int array[9]) {
+  int z, k, o;
+  i = i - (i % 3);
+  j = j - (j % 3);
+  o = 0;
   for (z = 0; z < 3; z++) {
     for (k = 0; k < 3; k++) {
       array[o++] = grid_read_value(g, i + z, j + k);
@@ -85,10 +84,11 @@ void grid_readBlock(int i, int j, Grid_T g, int array[9]) {
 }
 
 int grid_number_of_blanks(Grid_T g) {
-  int count = 0;
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      if (g.elts[i][j].val == 0) {
+  int i, j, count;
+  count = 0;
+  for (i = 0; i < 9; i++) {
+    for (j = 0; j < 9; j++) {
+      if (grid_read_value(g, i, j) == 0) {
         count++;
       }
     }
@@ -97,15 +97,20 @@ int grid_number_of_blanks(Grid_T g) {
 }
 
 void grid_set_all_choices(Grid_T *g, int i, int j) {
-  assert(g != NULL);
-  for (int o = 0; o < 10; o++) {
+  int o;
+  assert(g != 0);
+  for (o = 1; o <= 9; o++) {
     g->elts[i][j].choices.num[o] = 1;
   }
+  g->elts[i][j].choices.num[0] = 0;
+  g->elts[i][j].choices.count = 9;
 }
 
 void grid_clear_all_choices(Grid_T *g, int i, int j) {
-  assert(g != NULL);
-  for (int o = 0; o < 10; o++) {
+  int o;
+  assert(g != 0);
+  for (o = 0; o < 10; o++) {
     g->elts[i][j].choices.num[o] = 0;
   }
+  g->elts[i][j].choices.count = 0;
 }
